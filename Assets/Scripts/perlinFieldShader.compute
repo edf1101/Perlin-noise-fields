@@ -1,0 +1,89 @@
+#include "Assets/Libraries/ShaderSimplex.cginc"  // import noise lib
+
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMain
+
+
+RWTexture2D<float4> screenTex; // the texture which gets put on the screen
+RWStructuredBuffer<int2> pointsBuffer; // holds the position data for each point
+RWStructuredBuffer<float4> coloursBuffer; // holds the colour data for each point
+
+float2 screenSize; // size of screen
+int maxSteps; // how many times the algorithm gets iterated
+int stepWeight=1;
+float colourMomentum=1;
+bool renderFirst=false;
+
+//Noise settings
+float noiseFreq=1.0;
+float zVal=0;
+float persistence=0.5;
+float lacunarity=2;
+int octaves=1;
+
+// single texture of simplex noise with a specified frequency
+float createNoise(float2 _pos,float _frequency){
+    float rawValue = snoise( float3(_frequency* _pos.x,_frequency* _pos.y,zVal));
+    return rawValue;
+}
+
+// do fractal simplex noise
+float fractalNoise(float2 _pos){
+
+    float currentValue=0;
+
+    for(int currentOctave=0;currentOctave<octaves;currentOctave++){
+
+        float currentPersistence= pow(persistence,currentOctave);
+        float currentFreq= noiseFreq* pow(lacunarity,currentOctave);
+
+        currentValue+=currentPersistence*createNoise(_pos,currentFreq);
+
+    }
+     currentValue= clamp((currentValue+1)/2.0,0,1);
+    return currentValue;
+}
+
+
+[numthreads(1,1,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    float pi =3.1415926535; // weird glitch with defining floats so its here now
+
+
+    // calculate what index the point will be in made as a full variable
+    // in case we want more complex implentation later
+    int spawnIndex= id.x; 
+    float2 position= pointsBuffer[spawnIndex]; // get spawn point position;
+
+
+    // get colour from buffer
+    float3 baseColor= float3(coloursBuffer[spawnIndex].r,coloursBuffer[spawnIndex].g,coloursBuffer[spawnIndex].b);
+    float colourWeight=1;
+    for(int currentStep=0;currentStep<maxSteps;currentStep++){
+
+        float noiseVal = fractalNoise(position);// get noise at location
+        float changeAngle = noiseVal*2* pi; // map it as an angle
+
+        // find out where that angle takes us 
+        float2 nextPos = position+ float2(cos(changeAngle),sin(changeAngle))*stepWeight;
+
+        // Draw that pixel on the screen but dont draw pixel 0 to seem more random if renderfirst off
+        if((currentStep!=0 && !renderFirst) || renderFirst)
+            screenTex[position.xy]+=float4(baseColor.r,baseColor.g,baseColor.b,1);
+
+        baseColor*= colourMomentum; // lose colour intensity over time
+
+        position= nextPos; // update the new position
+
+
+        if(position.x<0 || position.x>screenSize.x || position.y<0 || position.y>screenSize.y ){
+            // its flowed out of range and we can kill it
+            break; 
+        }
+    }
+
+
+}
+
+

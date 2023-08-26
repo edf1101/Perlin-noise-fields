@@ -173,10 +173,49 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b73bd71d63484288a48a21dbb92b227, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  xDivisions: 199
+  steps: 63
+  stepDistance: 9
+  colourMomentum: 0.7
+  renderFirst: 0
+  noiseFreq: 0.004
+  zValue: 0
+  octaves: 2
+  persistance: 0.5
+  Lacunarity: 2
   rawImageTexture: {fileID: 0}
-  screenScale: 0.1
+  colourGradient:
+    serializedVersion: 2
+    key0: {r: 1, g: 1, b: 1, a: 1}
+    key1: {r: 1, g: 1, b: 1, a: 1}
+    key2: {r: 0, g: 0, b: 0, a: 0}
+    key3: {r: 0, g: 0, b: 0, a: 0}
+    key4: {r: 0, g: 0, b: 0, a: 0}
+    key5: {r: 0, g: 0, b: 0, a: 0}
+    key6: {r: 0, g: 0, b: 0, a: 0}
+    key7: {r: 0, g: 0, b: 0, a: 0}
+    ctime0: 0
+    ctime1: 65535
+    ctime2: 0
+    ctime3: 0
+    ctime4: 0
+    ctime5: 0
+    ctime6: 0
+    ctime7: 0
+    atime0: 0
+    atime1: 65535
+    atime2: 0
+    atime3: 0
+    atime4: 0
+    atime5: 0
+    atime6: 0
+    atime7: 0
+    m_Mode: 0
+    m_ColorSpace: -1
+    m_NumColorKeys: 2
+    m_NumAlphaKeys: 2
+  screenScale: 0.25
   myShader: {fileID: 7200000, guid: 74301a65e1ff5423f98b8a3085b53065, type: 3}
-  xDivisions: 10
 --- !u!114 &139726693
 MonoBehaviour:
   m_ObjectHideFlags: 0
